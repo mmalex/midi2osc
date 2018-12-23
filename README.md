@@ -35,7 +35,7 @@ at the time of writing, the code has been compiled & tested on mac & windows.
 on mac, just run 'make'. you need to have portmidi and glfw3 installed.
 I used https://brew.sh/ to install these dependencies.
 
-on windows, the build is likely currently broken as I haven't had a chance to test it.
+on windows, only the 32-bit build is functional (linking to precompiled 32-bit portmidi static lib).
 I've included a portmidi static lib in the repo as I found it hard to compile from source.
 
 Dependencies

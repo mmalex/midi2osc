@@ -1,4 +1,11 @@
 
+# macOS cruft
+.DS_Store
 portmidi_win/.DS_Store
 
-.DS_Store
+# Visual Studio cruft
+.vs/
+*.VC.db
+*.VC.VC.opendb
+Debug/
+Release/

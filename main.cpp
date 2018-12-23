@@ -10,7 +10,11 @@
 #pragma comment(lib,"ws2_32.lib") // for sockets
 #pragma comment(lib,"opengl32.lib") // for wglGetProcAddress
 #pragma comment(lib,"portmidi_win/portmidi_s.lib") // for midi
-#pragma comment(lib,"imgui/glfw/lib-vc2010-32/glfw3.lib") // for imgui rendering
+#ifdef _WIN64
+#pragma comment(lib,"imgui/examples/libs/glfw/lib-vc2010-64/glfw3.lib") // for imgui rendering
+#else
+#pragma comment(lib,"imgui/examples/libs/glfw/lib-vc2010-32/glfw3.lib") // for imgui rendering
+#endif
 #pragma comment(lib,"legacy_stdio_definitions.lib") // for vsnprintf
 #define close closesocket
 #define chdir _chdir
@@ -308,12 +312,6 @@ int main(int argc, char**argv){
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#if __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
     // Decide GL+GLSL versions
 #if __APPLE__
     // GL 3.2 + GLSL 150
