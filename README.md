@@ -44,8 +44,10 @@ Dependencies
 this little program uses the wonderful 'Dear Imgui' library by Omar Cornut
 https://github.com/ocornut/imgui
 
-it also uses the portmidi library for cross platform midi output
+it also uses the portmidi library for cross platform midi input
 http://portmedia.sourceforge.net/portmidi/
+
+it also uses glfw and gl3w, embedded as part of the Dear Imgui submodule, since it is based on the glfw/gl3 imgui sample.
 
 Issues
 ======
