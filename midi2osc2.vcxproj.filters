@@ -27,26 +27,29 @@
     <ClInclude Include="imgui\imgui_internal.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\stb_rect_pack.h">
+    <ClInclude Include="imgui\examples\libs\gl3w\GL\gl3w.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\stb_textedit.h">
+    <ClInclude Include="imgui\examples\libs\gl3w\GL\glcorearb.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\stb_truetype.h">
+    <ClInclude Include="imgui\examples\imgui_impl_opengl3.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\gl3w\GL\gl3w.h">
+    <ClInclude Include="imgui\examples\imgui_impl_glfw.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\gl3w\GL\glcorearb.h">
+    <ClInclude Include="imgui\imstb_rectpack.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_textedit.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_truetype.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="imgui_impl_glfw_gl3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -56,7 +59,16 @@
     <ClCompile Include="imgui\imgui_draw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="imgui\gl3w\GL\gl3w.c">
+    <ClCompile Include="imgui\examples\libs\gl3w\GL\gl3w.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\examples\imgui_impl_opengl3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\examples\imgui_impl_glfw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
