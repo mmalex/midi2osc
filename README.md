@@ -10,6 +10,8 @@ Using
 =====
 when the program runs, you should see a small window that looks like this:
 
+[[https://github.com/mmalex/midi2osc/blob/master/screenshot.png|alt=screenshot]]
+
 choose a midi input device from the first drop down. if you don't have a hardware midi input interface,
 or you want to route midi from a DAW running on the same computer, you need a midi loopback device.
 on mac, you can use OSX's built in IAC driver. 
