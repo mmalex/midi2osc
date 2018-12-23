@@ -26,7 +26,8 @@ void usleep(int usec) { Sleep(usec/1000); }
 #endif
 #define WINDOW_HEIGHT 500
 #include "imgui.h"
-#include "imgui_impl_glfw_gl3.h"
+#include "imgui/examples/imgui_impl_glfw.h"
+#include "imgui/examples/imgui_impl_opengl3.h"
 #include <stdio.h>
 #include <GL/gl3w.h>    // This example is using gl3w to access OpenGL functions (because it is small). You may use glew/glad/glLoadGen/etc. whatever already works for you.
 #include <GLFW/glfw3.h>
@@ -313,6 +314,23 @@ int main(int argc, char**argv){
 #if __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
+    // Decide GL+GLSL versions
+#if __APPLE__
+    // GL 3.2 + GLSL 150
+    const char* glsl_version = "#version 150";
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // Required on Mac
+#else
+    // GL 3.0 + GLSL 130
+    const char* glsl_version = "#version 130";
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
+#endif
+
     GLFWwindow* window = glfwCreateWindow(640, WINDOW_HEIGHT, "midi2osc", NULL, NULL);
 	glfwSetWindowSizeLimits(window, 640, WINDOW_HEIGHT, 640, WINDOW_HEIGHT);
     glfwMakeContextCurrent(window);
@@ -323,14 +341,20 @@ int main(int argc, char**argv){
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
-    ImGui_ImplGlfwGL3_Init(window, true);
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui::StyleColorsDark();
+
+    ImGui_ImplOpenGL3_Init(glsl_version);
+
     //ImGui::StyleColorsClassic();
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
-        ImGui_ImplGlfwGL3_NewFrame();
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
         ImGui::SetNextWindowPos(ImVec2(0, 0), 0); // ImGuiCond_FirstUseEver
         ImGui::SetNextWindowSize(ImVec2(640,WINDOW_HEIGHT), 0);
         ImGui::Begin("midi2osc", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings);
@@ -483,7 +507,8 @@ int main(int argc, char**argv){
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui::Render();
-        ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+
+                ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(window);
         usleep(16000);
     }
@@ -492,7 +517,7 @@ int main(int argc, char**argv){
     Pm_Terminate();
 
     // Cleanup
-    ImGui_ImplGlfwGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
     glfwTerminate();
 

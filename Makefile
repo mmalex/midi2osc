@@ -1,33 +1,19 @@
-#
-# Cross Platform Makefile
-# Compatible with MSYS2/MINGW, Ubuntu 14.04.1 and Mac OS X
-#
-# You will need GLFW (http://www.glfw.org):
-# Linux:
-#   apt-get install libglfw-dev
-# Mac OS X:
-#   brew install glfw
-# MSYS2:
-#   pacman -S --noconfirm --needed mingw-w64-x86_64-toolchain mingw-w64-x86_64-glfw
-#
-
-#CXX = g++
-#CXX = clang++
 
 EXE = midi2osc
-SOURCES = main.cpp imgui_impl_glfw_gl3.cpp
-SOURCES += imgui/imgui.cpp imgui/imgui_draw.cpp
-SOURCES += imgui/gl3w/GL/gl3w.c
+SOURCES = main.cpp imgui/examples/imgui_impl_glfw.cpp imgui/examples/imgui_impl_opengl3.cpp
+SOURCES += imgui/imgui.cpp imgui/imgui_draw.cpp imgui/imgui_widgets.cpp
+SOURCES += imgui/examples/libs/gl3w/GL/gl3w.c
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 
 UNAME_S := $(shell uname -s)
 
 
 ifeq ($(UNAME_S), Linux) #LINUX
+#untested - rotted now
 	ECHO_MESSAGE = "Linux"
 	LIBS = -lGL `pkg-config --static --libs glfw3`
 
-	CXXFLAGS = -Iimgui/ -Iimgui/gl3w `pkg-config --cflags glfw3`
+	CXXFLAGS = -Iimgui/ -Iimgui/examples/libs/gl3w `pkg-config --cflags glfw3`
 	CXXFLAGS += -Wall -Wformat -O2 
 	CFLAGS = $(CXXFLAGS)
 endif
@@ -35,24 +21,14 @@ endif
 ifeq ($(UNAME_S), Darwin) #APPLE
 	ECHO_MESSAGE = "Mac OS X"
 	LIBS = -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
-	#LIBS += -L/usr/local/lib -lglfw3
 	LIBS += -L/usr/local/lib -lglfw3 -lportmidi -headerpad_max_install_names
 
-	CXXFLAGS = -Iimgui/ -Iimgui/gl3w -I/usr/local/include -Wno-c++11-extensions
+	CXXFLAGS = -Iimgui/ -Iimgui/examples/libs/gl3w -Iimgui/examples/libs
+	CXXFLAGS += -I/usr/local/include 
+	CXXFLAGS += -Wno-c++11-extensions
 	CXXFLAGS += -Wall -Wformat -O2
 	CFLAGS = $(CXXFLAGS)
 endif
-
-ifeq ($(findstring MINGW,$(UNAME_S)),MINGW)
-   ECHO_MESSAGE = "Windows"
-   LIBS = -lglfw3 -lgdi32 -lopengl32 -limm32
-
-   CXXFLAGS = -Iimgui/ -Iimgui/gl3w `pkg-config --cflags glfw3`
-   CXXFLAGS += -Wall -Wformat
-   CFLAGS = $(CXXFLAGS)
-endif
-
-
 
 %.o:%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -60,7 +36,10 @@ endif
 %.o:imgui/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-%.o:imgui/gl3w/GL/%.c
+%.o:imgui/examples/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+%.o:imgui/examples/libs/gl3w/GL/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 all: $(EXE)
