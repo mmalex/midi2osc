@@ -26,7 +26,9 @@ void usleep(int usec) { Sleep(usec/1000); }
 #include <netdb.h>
 #include <unistd.h>
 #include <limits.h>
+#ifdef __APPLE__
 #include <CoreServices/CoreServices.h>
+#endif
 #endif
 #define WINDOW_HEIGHT 500
 #include "imgui.h"
@@ -268,7 +270,7 @@ void UpdateIP() {
 }
 int main(int argc, char**argv){    
     const char *home = 0;
-#ifndef _WIN32
+#ifdef __APPLE__
     FSRef fsref;
     unsigned char path[PATH_MAX];
     if (FSFindFolder(kUserDomain, kCurrentUserFolderType, kDontCreateFolder, &fsref) == noErr && FSRefMakePath(&fsref, path, sizeof(path)) == noErr)
