@@ -140,21 +140,22 @@ void ProcessMidiEvent(u32 dwParam1, bool mouse) {
             int shifted_note=msg.data1+127-topnote;
             if (msg.data1==topnote) msg.data1=127;
             if (msg.data1>=topnote-4 && msg.data1<topnote) {
-                if (miditype==8) {
+				// accept both note off and zero-velocity note events as key release
+                if (miditype==8 || (miditype==9 && msg.data2 == 0)) {
                     // note up. release the shifted note if it is down.						
-                    if (miditype==8 && keydown[shifted_note]&chanbit) msg.data1=shifted_note;
+                    if (keydown[shifted_note]&chanbit) msg.data1=shifted_note;
                 } else {
                     msg.data2=min(127,max(0,int(msg.data2*velocitysens*0.01f+127.f*0.01f*(100.f-velocitysens))));
                     // note down. shift if the top note is down.
                     if (keydown[127]&chanbit) msg.data1=shifted_note;					
                 }					
             }
-            if (miditype==9)
-                keydown[msg.data1]|=chanbit;
-            else
-                keydown[msg.data1]&=~chanbit;
-            if (miditype==9) 
-                lastnotes[chan]=msg.data1;
+			if (miditype == 9 && msg.data2 != 0) {
+				keydown[msg.data1] |= chanbit;
+				lastnotes[chan] = msg.data1;
+			} else {
+				keydown[msg.data1] &= ~chanbit;
+			}
         }
         if (miditype==0xb) {	
 			if (msg.data1==64) { // sustain pedal!
