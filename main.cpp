@@ -130,17 +130,17 @@ void ProcessMidiEvent(u32 dwParam1, bool mouse) {
         msg.msg=(unsigned char)dwParam1;
         msg.data1=(unsigned char)(dwParam1>>8);
         msg.data2=(unsigned char)(dwParam1>>16);
+		int miditype = (msg.msg & 0xf0) >> 4;
+		int original_data1 = msg.data1;
+		int original_data2 = msg.data2;
+		unsigned char chan = msg.msg & 0xf;
+		lastchan = chan;
 
 		// remap zero-velocity note-on events to note-off ones
-		if (msg.msg==0x90 && msg.data2 == 0) {
-			msg.msg=0x80;
+		if (miditype==9 && msg.data2 == 0) {
+			msg.msg=(8<<4 | chan);
+			miditype = 8;
 		}
-
-		int original_data1=msg.data1;
-		int original_data2=msg.data2;
-        int miditype=(msg.msg&0xf0)>>4;
-        unsigned char chan=msg.msg&0xf;			
-		lastchan=chan;
 
 		// ignore advanced midi messages
 		if (miditype < 0x8 || miditype > 0xe) return;
