@@ -129,7 +129,13 @@ void ProcessMidiEvent(u32 dwParam1, bool mouse) {
         int chanbit=1<<midichan;
         msg.msg=(unsigned char)dwParam1;
         msg.data1=(unsigned char)(dwParam1>>8);
-        msg.data2=(unsigned char)(dwParam1>>16);		
+        msg.data2=(unsigned char)(dwParam1>>16);
+
+		// remap zero-velocity note-on events to note-off ones
+		if (msg.msg==0x90 && msg.data2 == 0) {
+			msg.msg=0x80;
+		}
+
 		int original_data1=msg.data1;
 		int original_data2=msg.data2;
         int miditype=(msg.msg&0xf0)>>4;
@@ -149,7 +155,7 @@ void ProcessMidiEvent(u32 dwParam1, bool mouse) {
 			int shifted_note=msg.data1+127-topnote;
             if (msg.data1==topnote) msg.data1=127;
             if (msg.data1>=topnote-4 && msg.data1<topnote) {
-				if (miditype==8 || (miditype==9 && msg.data2 == 0)) {
+				if (miditype==8) {
                     // note up. release the shifted note if it is down.
                     if (keydown[shifted_note]&chanbit) msg.data1=shifted_note;
                 } else {
@@ -158,7 +164,7 @@ void ProcessMidiEvent(u32 dwParam1, bool mouse) {
                 }
             }
 
-			if (miditype == 9 && msg.data2 != 0) {
+			if (miditype == 9) {
 				// handle note-on
 				msg.data2 = min(127, max(0, int(msg.data2 * velocitysens * 0.01f + 127.f * 0.01f * (100.f - velocitysens))));
 				keydown[msg.data1] |= chanbit;
