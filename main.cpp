@@ -129,35 +129,53 @@ void ProcessMidiEvent(u32 dwParam1, bool mouse) {
         int chanbit=1<<midichan;
         msg.msg=(unsigned char)dwParam1;
         msg.data1=(unsigned char)(dwParam1>>8);
-        msg.data2=(unsigned char)(dwParam1>>16);		
-		int original_data1=msg.data1;
-		int original_data2=msg.data2;
-        int miditype=(msg.msg&0xf0)>>4;
-        unsigned char chan=msg.msg&0xf;			
-		lastchan=chan;
+        msg.data2=(unsigned char)(dwParam1>>16);
+		int miditype = (msg.msg & 0xf0) >> 4;
+		int original_data1 = msg.data1;
+		int original_data2 = msg.data2;
+		unsigned char chan = msg.msg & 0xf;
+		lastchan = chan;
+
+		// remap zero-velocity note-on events to note-off ones
+		if (miditype==9 && msg.data2 == 0) {
+			msg.msg=(8<<4 | chan);
+			miditype = 8;
+		}
+
+		// ignore advanced midi messages
+		if (miditype < 0x8 || miditype > 0xe) return;
+
         if (miditype==8 || miditype==9) {
+			// handle note-on and note-off events
+
+			// update the highest detected note
             if (!mouse && msg.data1>highestnoteseen) highestnoteseen=msg.data1;
-            int shifted_note=msg.data1+127-topnote;
+
+            // handle top note bound
+			int shifted_note=msg.data1+127-topnote;
             if (msg.data1==topnote) msg.data1=127;
             if (msg.data1>=topnote-4 && msg.data1<topnote) {
-				// accept both note off and zero-velocity note events as key release
-                if (miditype==8 || (miditype==9 && msg.data2 == 0)) {
-                    // note up. release the shifted note if it is down.						
+				if (miditype==8) {
+                    // note up. release the shifted note if it is down.
                     if (keydown[shifted_note]&chanbit) msg.data1=shifted_note;
                 } else {
-                    msg.data2=min(127,max(0,int(msg.data2*velocitysens*0.01f+127.f*0.01f*(100.f-velocitysens))));
                     // note down. shift if the top note is down.
                     if (keydown[127]&chanbit) msg.data1=shifted_note;					
-                }					
+                }
             }
-			if (miditype == 9 && msg.data2 != 0) {
+
+			if (miditype == 9) {
+				// handle note-on
+				msg.data2 = min(127, max(0, int(msg.data2 * velocitysens * 0.01f + 127.f * 0.01f * (100.f - velocitysens))));
 				keydown[msg.data1] |= chanbit;
 				lastnotes[chan] = msg.data1;
 			} else {
+				// handle note-off
 				keydown[msg.data1] &= ~chanbit;
 			}
         }
-        if (miditype==0xb) {	
+		else if (miditype==0xb) {
+			// handle control-change events
 			if (msg.data1==64) { // sustain pedal!
 				if (sustainmode==0)
 					msg.data2=0; // disable it
@@ -178,29 +196,30 @@ void ProcessMidiEvent(u32 dwParam1, bool mouse) {
                 else if (msg.data1==ccx) { xpos[chan]=msg.data2; msg.data1=12; }
                 else if (msg.data1==ccy) { ypos[chan]=msg.data2; msg.data1=13; }					
             }			
-        }			
-      //  printf("%02x %02x %02x %d\n",msg.msg, msg.data1, msg.data2,keydown[0]);
-        if (miditype>=0x8 && miditype<=0xe) {
-            SendOSCMsg(msg);
-            lastmsg=msg;
-			if (miditype==0x9 || ((miditype==0xd || miditype==0xa) && aftertouch2spicy)) {
-				int newspiciness;
-				if (miditype==0xa)
-					newspiciness=clamp(int(original_data2),0,127); // polyphonic aftertouch
-				else if (miditype==0xd)
-					newspiciness=clamp(int(original_data1),0,127); // aftertouch
-				else					
-					newspiciness=clamp(int(original_data2*velocity2spicy*0.01f),0,127);
-				if (newspiciness!=spiciness[chan]) {
-					spiciness[chan]=newspiciness;				
-					msg.msg&=0xf;
-					msg.msg|=0xb0;
-					msg.data1=1;
-					msg.data2=spiciness[chan];
-					SendOSCMsg(msg);
-				}
-			}
         }
+
+        SendOSCMsg(msg);
+        lastmsg=msg;
+
+		// update spiciness
+		if ((miditype==0x9 && msg.data2 != 0) || ((miditype==0xd || miditype==0xa) && aftertouch2spicy)) {
+			int newspiciness;
+			if (miditype==0xa)
+				newspiciness=clamp(int(original_data2),0,127); // polyphonic aftertouch
+			else if (miditype==0xd)
+				newspiciness=clamp(int(original_data1),0,127); // aftertouch
+			else					
+				newspiciness=clamp(int(original_data2*velocity2spicy*0.01f),0,127); // note-on
+
+			if (newspiciness!=spiciness[chan]) {
+				spiciness[chan]=newspiciness;				
+				msg.msg&=0xf;
+				msg.msg|=0xb0;
+				msg.data1=1;
+				msg.data2=spiciness[chan];
+				SendOSCMsg(msg);
+			}
+		}
     }
 }
 
