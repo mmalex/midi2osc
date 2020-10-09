@@ -4,7 +4,7 @@ this is a simple Midi to OpenSoundControl (aka OSC) bridge.
 it responds to midi messages on a midi input, and forwards them to OSC messages.
 see http://opensoundcontrol.org/ for more information about OSC.
 
-at the moment, it simply forwards all midi messages as a simple 'm' (midi) type OSC message to OSC path `/dreams`
+at the moment, it simply forwards all midi messages as a simple 'm' (midi) type OSC message to OSC path `/notes`
 
 Using
 =====
@@ -23,7 +23,7 @@ on windows, you can use a tool like midiox.
 clicking on the keyboard also generates midi events. if the midi input is working, you'll see messages at the bottom of the window.
 
 for the OSC output, type the IP address of the device you want to send the OSC messages to.
-it should be listening for OSC messages of type 'm' (midi) on OSC path /dreams
+it should be listening for OSC messages of type 'm' (midi) on OSC path /notes
 
 I'll leave you to experiment with the other controls
 

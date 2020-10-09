@@ -75,9 +75,9 @@ int min(int a,int b) { return (a<b)?a:b; }
 int max(int a,int b) { return (a>b)?a:b; }
 int clamp(int x, int a, int b) { return min(max(x,a),b); }
 struct Message {	
-    // "/dreams\0" - 8
+    // "/notes\0\0" - 8
     // ",m\0\0" - 4
-    char header[12]="/dreams\0,m\0";
+    char header[12]="/notes\0\0,m\0";
 	unsigned char deviceidx=0;
 	unsigned char msg=0;
 	unsigned char data1=0;
